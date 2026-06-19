@@ -24,6 +24,7 @@ import com.qadam.lastpuff.ui.components.HugeSosButton
 import com.qadam.lastpuff.ui.components.QadamCard
 import com.qadam.lastpuff.ui.components.StatCard
 import com.qadam.lastpuff.ui.viewmodel.AppViewModel
+import com.qadam.lastpuff.util.StatsCalculator
 import java.util.Locale
 
 @Composable
@@ -180,7 +181,7 @@ fun HomeScreen(
                 )
                 StatCard(
                     title = "Сэкономлено",
-                    value = if (s.moneySaved < 1) "—" else String.format(Locale.getDefault(), "%.0f", s.moneySaved),
+                    value = StatsCalculator.formatMoney(s.moneySaved),
                     modifier = Modifier.weight(1f),
                     subtitle = profile?.currency ?: "₸"
                 )

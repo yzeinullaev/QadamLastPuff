@@ -1,6 +1,10 @@
 package com.qadam.lastpuff.ui.screens.sos
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -115,13 +119,26 @@ fun SosScreen(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    IconButton(
+                        onClick = {
+                            if (state.step == SosStep.BREATHING) {
+                                viewModel.resumeTimer()
+                            }
+                        },
+                        enabled = state.step == SosStep.BREATHING
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "К таймеру",
+                            tint = Color.White.copy(alpha = if (state.step == SosStep.BREATHING) 1f else 0f)
+                        )
+                    }
+                }
+
                 if (state.step == SosStep.BREATHING) {
                     Spacer(modifier = Modifier.weight(1f))
                     BreathingCircle(phase = state.breathingPhase)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    OutlinedButton(onClick = { viewModel.resumeTimer() }) {
-                        Text("К таймеру", color = Color.White)
-                    }
                     Spacer(modifier = Modifier.weight(1f))
                 } else {
                     Spacer(modifier = Modifier.weight(0.12f))

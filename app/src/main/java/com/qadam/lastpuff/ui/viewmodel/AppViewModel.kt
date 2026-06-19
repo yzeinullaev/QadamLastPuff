@@ -237,11 +237,13 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
         val pricePerCig = if (p != null && p.cigarettesInPack > 0) {
             p.packPrice / p.cigarettesInPack
         } else 0.0
+        val moneySaved = p?.let { StatsCalculator.moneySaved(it) } ?: 0.0
         return SupportContext(
             reasons = p?.reasons ?: emptyList(),
             goalTitle = goal?.title,
             currency = p?.currency ?: "₸",
             pricePerCigarette = pricePerCig,
+            moneySaved = moneySaved,
             totalWins = victories.value.size,
             personalLetter = personalLetter.value,
             hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)

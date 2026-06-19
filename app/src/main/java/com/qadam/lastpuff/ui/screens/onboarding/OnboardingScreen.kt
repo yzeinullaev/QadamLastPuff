@@ -37,6 +37,8 @@ import com.qadam.lastpuff.domain.model.UserProfile
 import com.qadam.lastpuff.ui.components.SectionTitle
 import com.qadam.lastpuff.ui.viewmodel.AppViewModel
 import com.qadam.lastpuff.util.AppConstants
+import com.qadam.lastpuff.util.PhoneMask
+import com.qadam.lastpuff.util.PhoneTextField
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -184,11 +186,10 @@ fun OnboardingScreen(viewModel: AppViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                OutlinedTextField(
+                PhoneTextField(
                     value = sosPhone,
                     onValueChange = { sosPhone = it },
-                    label = { Text("Телефон") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    label = "Телефон",
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(12.dp))

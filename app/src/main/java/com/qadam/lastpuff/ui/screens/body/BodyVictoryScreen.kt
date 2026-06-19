@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.qadam.lastpuff.domain.model.RecoveryBoosts
 import com.qadam.lastpuff.domain.model.RecoveryIndex
 import com.qadam.lastpuff.ui.components.BodySilhouette
 import com.qadam.lastpuff.ui.components.CoinDropAnimation
@@ -43,18 +42,10 @@ private val VictoryGreen = Color(0xFF4CAF50)
 private val VictoryBg = Color(0xFF0A0A0A)
 private val CardDark = Color(0xFF1A1F1C)
 
-data class VictoryBoostItem(
+private data class VictoryBoostItem(
     val emoji: String,
     val label: String,
     val boost: Float
-)
-
-private val victoryBoosts = listOf(
-    VictoryBoostItem("❤️", "Сердце", RecoveryBoosts.SOS_WIN.heart),
-    VictoryBoostItem("🫁", "Лёгкие", RecoveryBoosts.SOS_WIN.lungs),
-    VictoryBoostItem("🩸", "Кровь", RecoveryBoosts.SOS_WIN.blood),
-    VictoryBoostItem("🧠", "Мозг / контроль", RecoveryBoosts.SOS_WIN.brain),
-    VictoryBoostItem("🛡", "Сила воли", RecoveryBoosts.SOS_WIN.willpower)
 )
 
 @Composable
@@ -68,6 +59,15 @@ fun BodyVictoryScreen(
 ) {
     val waveProgress = remember { Animatable(0f) }
     val organsAfter = remember(after) { RecoveryCalculator.toOrgans(after) }
+    val boosts = remember(before, after) {
+        listOf(
+            VictoryBoostItem("❤️", "Сердце", after.heart - before.heart),
+            VictoryBoostItem("🫁", "Лёгкие", after.lungs - before.lungs),
+            VictoryBoostItem("🩸", "Кровь", after.blood - before.blood),
+            VictoryBoostItem("🧠", "Мозг", after.brain - before.brain),
+            VictoryBoostItem("🛡", "Сила воли", after.willpower - before.willpower)
+        ).filter { it.boost > 0.01f }
+    }
 
     LaunchedEffect(Unit) {
         delay(300)
@@ -129,26 +129,28 @@ fun BodyVictoryScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(CardDark)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Организм восстановился ещё на",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                victoryBoosts.forEach { item ->
-                    AnimatedBoostRow(
-                        item = item,
-                        beforeValue = valueForOrgan(before, item.label),
-                        afterValue = valueForOrgan(after, item.label)
+            if (boosts.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(CardDark)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Организм восстановился ещё на",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Color.White.copy(alpha = 0.7f)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    boosts.forEach { item ->
+                        AnimatedBoostRow(
+                            item = item,
+                            beforeValue = valueForOrgan(before, item.label),
+                            afterValue = valueForOrgan(after, item.label)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
 

@@ -46,7 +46,7 @@ data class SupportContext(
     val goalTitle: String? = null,
     val currency: String = "₸",
     val pricePerCigarette: Double = 0.0,
-    val moneySavedSession: Double = 0.0,
+    val moneySaved: Double = 0.0,
     val totalWins: Int = 0,
     val personalLetter: String? = null,
     val hourOfDay: Int = 12

@@ -17,16 +17,24 @@ object StatsCalculator {
     fun minutesWithoutSmoking(lastSmokeDate: Long, now: Long = System.currentTimeMillis()): Long =
         (elapsedMillis(lastSmokeDate, now) / (60 * 1000L)) % 60
 
+    fun cigarettesNotSmokedExact(profile: UserProfile, now: Long = System.currentTimeMillis()): Double {
+        val elapsedHours = elapsedMillis(profile.lastSmokeDate, now).toDouble() / (60 * 60 * 1000.0)
+        val perHour = profile.cigarettesPerDay.toDouble() / 24.0
+        return elapsedHours * perHour
+    }
+
     fun cigarettesNotSmoked(profile: UserProfile, now: Long = System.currentTimeMillis()): Int {
-        val days = elapsedMillis(profile.lastSmokeDate, now).toDouble() / (24 * 60 * 60 * 1000.0)
-        return floor(days * profile.cigarettesPerDay).toInt()
+        return floor(cigarettesNotSmokedExact(profile, now)).toInt()
     }
 
     fun moneySaved(profile: UserProfile, now: Long = System.currentTimeMillis()): Double {
         if (profile.cigarettesInPack <= 0) return 0.0
         val pricePerCigarette = profile.packPrice / profile.cigarettesInPack
-        return cigarettesNotSmoked(profile, now) * pricePerCigarette
+        return cigarettesNotSmokedExact(profile, now) * pricePerCigarette
     }
+
+    fun formatMoney(amount: Double): String =
+        if (amount < 0.5) "—" else String.format("%.0f", amount.roundToInt().toDouble())
 
     fun winRate(wins: Int, total: Int): Float =
         if (total == 0) 0f else wins.toFloat() / total * 100f

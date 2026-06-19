@@ -39,9 +39,8 @@ object SosMessageComposer {
             }
             45 -> secondary = session.pick(MessageCategory.FUTURE_HOLD)
             60 -> {
-                if (ctx.pricePerCigarette > 0) {
-                    val saved = ctx.pricePerCigarette.coerceAtLeast(1.0)
-                    secondary = "Пока ты держишься, ты уже сохранил ещё ${saved.toInt()} ${ctx.currency}."
+                if (ctx.moneySaved >= 1.0) {
+                    secondary = "Пока ты держишься, ты уже сэкономил ${ctx.moneySaved.toInt()} ${ctx.currency}."
                 } else {
                     secondary = session.pick(MessageCategory.MONEY)
                 }

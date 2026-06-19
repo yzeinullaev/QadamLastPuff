@@ -39,6 +39,7 @@ class UserRepository(
     private val sosContactDao: SosContactDao,
     private val preferencesManager: PreferencesManager
 ) {
+    val isFirstLaunch: Flow<Boolean> = preferencesManager.isFirstLaunch
     val onboardingCompleted: Flow<Boolean> = preferencesManager.onboardingCompleted
     val darkTheme: Flow<Boolean?> = preferencesManager.darkTheme
     val notificationsEnabled: Flow<Boolean> = preferencesManager.notificationsEnabled
@@ -74,6 +75,20 @@ class UserRepository(
         sosContactDao.insert(sosContact.toEntity())
         preferencesManager.setPersonalLetter(personalLetter)
         preferencesManager.setOnboardingCompleted(true)
+    }
+
+    suspend fun setFirstLaunchComplete() {
+        preferencesManager.setFirstLaunchComplete()
+    }
+
+    suspend fun syncLaunchState() {
+        val profile = getProfile()
+        val onboardingDone = preferencesManager.onboardingCompleted.first()
+        if (profile != null && !onboardingDone) {
+            preferencesManager.setOnboardingCompleted(true)
+        } else if (profile == null && onboardingDone) {
+            preferencesManager.setOnboardingCompleted(false)
+        }
     }
 
     suspend fun saveSosContact(contact: SosContact) {

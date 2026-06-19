@@ -18,6 +18,7 @@ class PreferencesManager(context: Context) {
     private val dataStore = context.dataStore
 
     private object Keys {
+        val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
@@ -32,6 +33,9 @@ class PreferencesManager(context: Context) {
         val PERSONAL_LETTER = stringPreferencesKey("personal_letter")
         val RECOVERY_INDEX = stringPreferencesKey("recovery_index")
     }
+
+    val isFirstLaunch: Flow<Boolean> =
+        dataStore.data.map { it[Keys.IS_FIRST_LAUNCH] ?: true }
 
     val onboardingCompleted: Flow<Boolean> =
         dataStore.data.map { it[Keys.ONBOARDING_COMPLETED] ?: false }
@@ -52,6 +56,10 @@ class PreferencesManager(context: Context) {
 
     fun totalCoinsFlow(): Flow<Int> = dataStore.data.map { it[Keys.TOTAL_COINS] ?: 0 }
     fun longestStreakFlow(): Flow<Int> = dataStore.data.map { it[Keys.LONGEST_STREAK] ?: 0 }
+
+    suspend fun setFirstLaunchComplete() {
+        dataStore.edit { it[Keys.IS_FIRST_LAUNCH] = false }
+    }
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
         dataStore.edit { it[Keys.ONBOARDING_COMPLETED] = completed }

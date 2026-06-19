@@ -47,6 +47,8 @@ import com.qadam.lastpuff.domain.model.SosContact
 import com.qadam.lastpuff.ui.components.SectionTitle
 import com.qadam.lastpuff.ui.viewmodel.AppViewModel
 import com.qadam.lastpuff.util.AppConstants
+import com.qadam.lastpuff.util.PhoneMask
+import com.qadam.lastpuff.util.PhoneTextField
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -83,7 +85,7 @@ fun ProfileScreen(viewModel: AppViewModel) {
     var cigarettesInPack by remember(profile) { mutableStateOf(profile?.cigarettesInPack?.toString() ?: "") }
     var selectedReasons by remember(profile) { mutableStateOf(profile?.reasons?.toSet() ?: emptySet()) }
     var sosName by remember(sosContact) { mutableStateOf(sosContact?.name ?: "") }
-    var sosPhone by remember(sosContact) { mutableStateOf(sosContact?.phone ?: "") }
+    var sosPhone by remember(sosContact) { mutableStateOf(PhoneMask.format(sosContact?.phone ?: "")) }
     var sosMessage by remember(sosContact) { mutableStateOf(sosContact?.message ?: "") }
 
     val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()) }
@@ -173,11 +175,10 @@ fun ProfileScreen(viewModel: AppViewModel) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
+            PhoneTextField(
                 value = sosPhone,
                 onValueChange = { sosPhone = it },
-                label = { Text("Телефон") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                label = "Телефон",
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))

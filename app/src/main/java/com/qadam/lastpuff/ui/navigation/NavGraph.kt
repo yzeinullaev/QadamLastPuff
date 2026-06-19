@@ -31,15 +31,17 @@ import com.qadam.lastpuff.util.RecoveryCalculator
 fun QadamNavGraph(viewModel: AppViewModel) {
     val navController = rememberNavController()
     val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
+    val profile by viewModel.profile.collectAsState()
+    val canShowMainApp = onboardingCompleted && profile != null
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = onboardingCompleted &&
+    val showBottomBar = canShowMainApp &&
         currentRoute != Screen.Onboarding.route &&
         currentRoute != Screen.Sos.route
 
-    LaunchedEffect(onboardingCompleted) {
-        if (onboardingCompleted && currentRoute == Screen.Onboarding.route) {
+    LaunchedEffect(canShowMainApp) {
+        if (canShowMainApp && currentRoute == Screen.Onboarding.route) {
             navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.Onboarding.route) { inclusive = true }
             }
@@ -58,7 +60,7 @@ fun QadamNavGraph(viewModel: AppViewModel) {
 
     NavHost(
         navController = navController,
-        startDestination = if (onboardingCompleted) Screen.Home.route else Screen.Onboarding.route
+        startDestination = if (canShowMainApp) Screen.Home.route else Screen.Onboarding.route
     ) {
         composable(Screen.Onboarding.route) {
             OnboardingScreen(viewModel = viewModel)
