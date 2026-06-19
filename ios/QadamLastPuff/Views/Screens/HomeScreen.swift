@@ -4,6 +4,7 @@ struct HomeScreen: View {
     @ObservedObject var viewModel: AppViewModel
     let onSosClick: () -> Void
     let onEmergencySosClick: () -> Void
+    @State private var showRelapseDialog = false
 
     var body: some View {
         ScrollView {
@@ -24,6 +25,18 @@ struct HomeScreen: View {
                 }
             }
             .padding(20)
+        }
+        .confirmationDialog(
+            "Записать срыв?",
+            isPresented: $showRelapseDialog,
+            titleVisibility: .visible
+        ) {
+            Button("Записать и начать заново", role: .destructive) {
+                viewModel.recordRelapse()
+            }
+            Button("Отмена", role: .cancel) {}
+        } message: {
+            Text("Счётчик дней и сэкономленные деньги пересчитаются с этого момента.\n\nОдин срыв не отменяет весь путь — ты продолжаешь.")
         }
     }
 
@@ -110,6 +123,15 @@ struct HomeScreen: View {
                         .foregroundStyle(QadamColors.greenPrimary)
                 }
             }
+        }
+
+        Text("Честность с собой")
+            .font(.headline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+        RelapseReportCard {
+            showRelapseDialog = true
         }
 
         QadamCard {

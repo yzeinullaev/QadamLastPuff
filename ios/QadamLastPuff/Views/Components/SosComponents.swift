@@ -104,7 +104,15 @@ struct BreathingCircle: View {
 struct CoinDropAnimation: View {
     let visible: Bool
     let totalCoins: Int
+    var coinsEarned: Int = 1
     @State private var scale: CGFloat = 0
+
+    private var rewardText: String {
+        switch coinsEarned {
+        case 2: return "+2 монетки"
+        default: return "+1 монетка"
+        }
+    }
 
     var body: some View {
         if visible {
@@ -112,9 +120,14 @@ struct CoinDropAnimation: View {
                 Text("💰")
                     .font(.system(size: 64 * max(scale, 0.1)))
                     .scaleEffect(scale)
-                Text("+1 монетка")
+                Text(rewardText)
                     .font(.title2.bold())
                     .foregroundStyle(QadamColors.willpowerYellow)
+                if coinsEarned >= AppConstants.coinRewardStrong {
+                    Text("Бонус за сильную тягу!")
+                        .font(.subheadline)
+                        .foregroundStyle(QadamColors.willpowerYellow.opacity(0.85))
+                }
                 Text("В копилке: \(totalCoins)")
                     .foregroundStyle(.white.opacity(0.9))
             }
@@ -138,5 +151,26 @@ struct SosFullscreenBackground<Content: View>: View {
             QadamColors.sosRedDark.ignoresSafeArea()
             content
         }
+    }
+}
+
+struct SosSolidButton: View {
+    let title: String
+    var disabled: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(QadamColors.sosRedDark.opacity(disabled ? 0.45 : 1))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(Color.white.opacity(disabled ? 0.55 : 1))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: .black.opacity(0.18), radius: 6, y: 2)
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
     }
 }

@@ -181,6 +181,13 @@ object SupportMessageBank {
             "Ещё минута. Мы почти у цели.",
             "Ты не один в этом моменте."
         ),
+        MessageCategory.CHECK_IN to listOf(
+            "Как день? Не было срыва?",
+            "Как ты сегодня? Держишься без сигарет?",
+            "Проверка дня: всё ли в порядке?",
+            "Как прошёл день? Ты справился?",
+            "Был ли сегодня срыв? Если нет — это победа."
+        ),
         MessageCategory.FUTURE_HOLD to listOf(
             "Если выдержишь ещё минуту, вероятность закурить станет значительно ниже.",
             "Каждая секунда сейчас укрепляет твою новую привычку.",
@@ -211,6 +218,15 @@ object SupportMessageBank {
         }
         return session.pick(category)
     }
+
+    fun checkInMessage(hour: Int, session: MessageSession): String {
+        val intro = session.pick(MessageCategory.CHECK_IN)
+        val quote = dayMessage(hour, session)
+        return "$intro $quote"
+    }
+
+    fun holdingEncouragement(session: MessageSession): String =
+        session.pick(MessageCategory.VICTORY)
 
     fun memoryForReason(reason: String, goalTitle: String?): String? = when (reason) {
         "Дети" -> "Представь, как через год ты играешь с детьми без одышки."

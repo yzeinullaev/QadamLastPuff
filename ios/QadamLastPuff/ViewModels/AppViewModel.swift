@@ -156,6 +156,11 @@ final class AppViewModel: ObservableObject {
         refreshAll()
     }
 
+    func recordRelapse() {
+        repository.recordRelapse()
+        refreshAll()
+    }
+
     func startSos() {
         messageSession = MessageSession()
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
@@ -297,7 +302,7 @@ final class AppViewModel: ObservableObject {
     func completeSos(success: Bool) {
         let session = messageSession
         let recoveryPair = success ? repository.applySosRecoveryBoost() : (RecoveryIndex(), RecoveryIndex())
-        repository.recordCraving(
+        let coinsEarned = repository.recordCraving(
             intensity: sosState.intensity,
             trigger: sosState.trigger.isEmpty ? "Не указано" : sosState.trigger,
             location: sosState.location,
@@ -316,7 +321,8 @@ final class AppViewModel: ObservableObject {
 
         sosState.step = success ? .success : .relapse
         sosState.success = success
-        sosState.showCoinAnimation = success
+        sosState.showCoinAnimation = success && coinsEarned > 0
+        sosState.coinsEarned = coinsEarned
         sosState.currentMessage = endMessage
         sosState.recoveryBefore = recoveryPair.0
         sosState.recoveryAfter = recoveryPair.1

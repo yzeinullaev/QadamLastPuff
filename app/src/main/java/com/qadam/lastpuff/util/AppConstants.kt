@@ -4,6 +4,12 @@ object AppConstants {
     const val SOS_TIMER_SECONDS = 180
     const val SOS_MESSAGE_INTERVAL_SECONDS = 15
     const val LONG_PRESS_MS = 2000L
+    const val STRONG_CRAVING_INTENSITY = 8
+    const val COIN_REWARD_NORMAL = 1
+    const val COIN_REWARD_STRONG = 2
+
+    fun coinRewardForIntensity(intensity: Int): Int =
+        if (intensity >= STRONG_CRAVING_INTENSITY) COIN_REWARD_STRONG else COIN_REWARD_NORMAL
 
     val SMOKE_TYPES = listOf(
         "Сигареты", "Вейп", "IQOS", "Кальян", "Другое"
@@ -43,6 +49,10 @@ object AppConstants {
         Triple("money_10000", "10 000 ₸", "10 000 ₸ сэкономлено"),
         Triple("wins_10", "10 побед", "10 побед над тягой"),
         Triple("wins_50", "50 побед", "50 побед над тягой"),
+        Triple("coins_20", "20 монет", "20 монет в копилке побед"),
+        Triple("coins_40", "40 монет", "40 монет в копилке побед"),
+        Triple("coins_80", "80 монет", "80 монет в копилке побед"),
+        Triple("coins_110", "110 монет", "110 монет в копилке побед"),
         Triple("relapse_survived", "Срыв пережит", "Первый срыв пережит без отказа от цели")
     )
 

@@ -138,6 +138,10 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
         viewModelScope.launch { repository.resetProgress() }
     }
 
+    fun recordRelapse() {
+        viewModelScope.launch { repository.recordRelapse() }
+    }
+
     fun startSos() {
         messageSession = MessageSession()
         val mode = SosMode.forDay(Calendar.getInstance().get(Calendar.DAY_OF_YEAR))
@@ -288,7 +292,7 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
             } else {
                 RecoveryIndex() to RecoveryIndex()
             }
-            repository.recordCraving(
+            val coinsEarned = repository.recordCraving(
                 intensity = state.intensity,
                 trigger = state.trigger.ifBlank { "Не указано" },
                 success = success
@@ -301,7 +305,8 @@ class AppViewModel(private val repository: UserRepository) : ViewModel() {
             _sosState.value = state.copy(
                 step = if (success) SosStep.SUCCESS else SosStep.RELAPSE,
                 success = success,
-                showCoinAnimation = success,
+                showCoinAnimation = success && coinsEarned > 0,
+                coinsEarned = coinsEarned,
                 currentMessage = endMessage,
                 recoveryBefore = recoveryPair.first,
                 recoveryAfter = recoveryPair.second
@@ -355,6 +360,7 @@ data class SosUiState(
     val showPhoto: Boolean = false,
     val showPersonalLetterDialog: Boolean = false,
     val showCoinAnimation: Boolean = false,
+    val coinsEarned: Int = 0,
     val success: Boolean = false,
     val recoveryBefore: RecoveryIndex = RecoveryIndex(),
     val recoveryAfter: RecoveryIndex = RecoveryIndex()

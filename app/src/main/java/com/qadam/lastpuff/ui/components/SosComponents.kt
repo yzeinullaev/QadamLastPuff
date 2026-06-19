@@ -185,6 +185,7 @@ fun BreathingCircle(phase: Int, modifier: Modifier = Modifier) {
 fun CoinDropAnimation(
     visible: Boolean,
     totalCoins: Int,
+    coinsEarned: Int = 1,
     modifier: Modifier = Modifier
 ) {
     val scale = remember { Animatable(0f) }
@@ -208,11 +209,21 @@ fun CoinDropAnimation(
                 modifier = Modifier.scale(scale.value)
             )
             Text(
-                text = "+1 монетка",
+                text = when (coinsEarned) {
+                    2 -> "+2 монетки"
+                    else -> "+1 монетка"
+                },
                 style = MaterialTheme.typography.titleLarge,
                 color = Color(0xFFFFD54F),
                 fontWeight = FontWeight.Bold
             )
+            if (coinsEarned >= AppConstants.COIN_REWARD_STRONG) {
+                Text(
+                    text = "Бонус за сильную тягу!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFFFFD54F).copy(alpha = 0.85f)
+                )
+            }
             Text(
                 text = "В копилке: $totalCoins",
                 style = MaterialTheme.typography.bodyLarge,

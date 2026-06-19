@@ -4,6 +4,13 @@ enum AppConstants {
     static let sosTimerSeconds = 180
     static let sosMessageIntervalSeconds = 15
     static let longPressMs: UInt64 = 2_000_000_000
+    static let strongCravingIntensity = 8
+    static let coinRewardNormal = 1
+    static let coinRewardStrong = 2
+
+    static func coinReward(for intensity: Int) -> Int {
+        intensity >= strongCravingIntensity ? coinRewardStrong : coinRewardNormal
+    }
 
     static let smokeTypes = ["Сигареты", "Вейп", "IQOS", "Кальян", "Другое"]
     static let quitReasons = ["Здоровье", "Семья", "Дети", "Деньги", "Спорт", "Запах", "Надоело", "Другое"]
@@ -27,6 +34,10 @@ enum AppConstants {
         "money_10000": "💰",
         "wins_10": "⭐",
         "wins_50": "🌟",
+        "coins_20": "🪙",
+        "coins_40": "💰",
+        "coins_80": "🏦",
+        "coins_110": "👑",
         "relapse_survived": "💚"
     ]
 
@@ -59,6 +70,10 @@ enum AppConstants {
         ("money_10000", "10 000 ₸", "10 000 ₸ сэкономлено"),
         ("wins_10", "10 побед", "10 побед над тягой"),
         ("wins_50", "50 побед", "50 побед над тягой"),
+        ("coins_20", "20 монет", "20 монет в копилке побед"),
+        ("coins_40", "40 монет", "40 монет в копилке побед"),
+        ("coins_80", "80 монет", "80 монет в копилке побед"),
+        ("coins_110", "110 монет", "110 монет в копилке побед"),
         ("relapse_survived", "Срыв пережит", "Первый срыв пережит без отказа от цели")
     ]
 

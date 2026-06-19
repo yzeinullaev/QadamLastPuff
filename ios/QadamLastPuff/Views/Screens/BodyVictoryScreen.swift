@@ -5,6 +5,7 @@ struct BodyVictoryScreen: View {
     let after: RecoveryIndex
     let showCoinAnimation: Bool
     let totalCoins: Int
+    var coinsEarned: Int = 1
     let onContinue: () -> Void
 
     @State private var waveProgress: CGFloat = 0
@@ -23,7 +24,11 @@ struct BodyVictoryScreen: View {
         ScrollView {
             VStack(spacing: 20) {
                 if showCoinAnimation {
-                    CoinDropAnimation(visible: true, totalCoins: totalCoins)
+                    CoinDropAnimation(
+                        visible: true,
+                        totalCoins: totalCoins,
+                        coinsEarned: coinsEarned
+                    )
                 }
 
                 Text("✨").font(.largeTitle)

@@ -34,6 +34,7 @@ struct SosScreen: View {
                     after: viewModel.sosState.recoveryAfter,
                     showCoinAnimation: viewModel.sosState.showCoinAnimation,
                     totalCoins: viewModel.homeStats?.totalCoins ?? 0,
+                    coinsEarned: viewModel.sosState.coinsEarned,
                     onContinue: { viewModel.resetSos(); onComplete() }
                 )
             case .relapse:
@@ -93,63 +94,72 @@ struct SosScreen: View {
 
     private var intakeView: some View {
         SosFullscreenBackground {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Button {
-                            viewModel.resetSos()
-                            onBack()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .foregroundStyle(.white)
-                                .padding(8)
-                                .background(.white.opacity(0.2))
-                                .clipShape(Circle())
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        HStack {
+                            Button {
+                                viewModel.resetSos()
+                                onBack()
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .foregroundStyle(.white)
+                                    .padding(8)
+                                    .background(.white.opacity(0.2))
+                                    .clipShape(Circle())
+                            }
+                            Spacer()
                         }
-                        Spacer()
+
+                        Text("Расскажи, что происходит")
+                            .font(.title2.bold())
+                            .foregroundStyle(.white)
+                        Text("Это поможет понять твои триггеры и стать сильнее")
+                            .foregroundStyle(.white.opacity(0.8))
+
+                        Text("Из-за чего?").font(.headline).foregroundStyle(.white)
+                        ChipFlowView(
+                            items: AppConstants.cravingTriggers,
+                            selection: viewModel.sosState.trigger,
+                            lightOnDark: true,
+                            onSelect: { viewModel.setSosTrigger($0) }
+                        )
+
+                        Text("Где ты сейчас?").font(.headline).foregroundStyle(.white)
+                        ChipFlowView(
+                            items: AppConstants.cravingLocations,
+                            selection: viewModel.sosState.location,
+                            lightOnDark: true,
+                            onSelect: { viewModel.setSosLocation($0) }
+                        )
+
+                        Text("Насколько сильная тяга: \(viewModel.sosState.intensity)")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        Slider(value: Binding(
+                            get: { Double(viewModel.sosState.intensity) },
+                            set: { viewModel.setSosIntensity(Int($0)) }
+                        ), in: 1...10, step: 1)
+                        .tint(.white)
                     }
+                    .padding(24)
+                }
 
-                    Text("Расскажи, что происходит")
-                        .font(.title2.bold())
-                        .foregroundStyle(.white)
-                    Text("Это поможет понять твои триггеры и стать сильнее")
-                        .foregroundStyle(.white.opacity(0.8))
-
-                    Text("Из-за чего?").font(.headline).foregroundStyle(.white)
-                    ChipFlowView(
-                        items: AppConstants.cravingTriggers,
-                        selection: viewModel.sosState.trigger,
-                        lightOnDark: true,
-                        onSelect: { viewModel.setSosTrigger($0) }
-                    )
-
-                    Text("Где ты сейчас?").font(.headline).foregroundStyle(.white)
-                    ChipFlowView(
-                        items: AppConstants.cravingLocations,
-                        selection: viewModel.sosState.location,
-                        lightOnDark: true,
-                        onSelect: { viewModel.setSosLocation($0) }
-                    )
-
-                    Text("Насколько сильная тяга: \(viewModel.sosState.intensity)")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                    Slider(value: Binding(
-                        get: { Double(viewModel.sosState.intensity) },
-                        set: { viewModel.setSosIntensity(Int($0)) }
-                    ), in: 1...10, step: 1)
-                    .tint(.white)
-
-                    Button("Начать 3 минуты вместе") {
+                VStack(spacing: 8) {
+                    if viewModel.sosState.trigger.isEmpty {
+                        Text("Выбери триггер, чтобы начать")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    SosSolidButton(
+                        title: "Начать 3 минуты вместе",
+                        disabled: viewModel.sosState.trigger.isEmpty
+                    ) {
                         viewModel.confirmSosIntakeAndStartTimer()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.white)
-                    .foregroundStyle(QadamColors.sosRedDark)
-                    .frame(maxWidth: .infinity)
-                    .disabled(viewModel.sosState.trigger.isEmpty)
                 }
-                .padding(24)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
             }
         }
     }
@@ -409,12 +419,12 @@ private struct EmergencyScreen: View {
                     if let contact {
                         Text(contact.name).foregroundStyle(.white.opacity(0.8))
                     }
-                    emergencyButton("Позвонить", action: onCall)
-                    emergencyButton("SMS", action: onSms)
+                    emergencyButton("📞 Позвонить \(contact?.name ?? "")", action: onCall)
+                    emergencyButton("💬 SMS", action: onSms)
                     emergencyButton("WhatsApp", action: onWhatsApp)
                     emergencyButton("Telegram", action: onTelegram)
-                    emergencyButton("Дыхание", action: onBreathing)
-                    emergencyButton("⏱ 3 минуты вместе", action: onTimer)
+                    emergencyButton("🌬 Дыхание", action: onBreathing)
+                    SosSolidButton(title: "⏱ 3 минуты вместе", action: onTimer)
                     Button("Назад", action: onBack)
                         .foregroundStyle(.white.opacity(0.8))
                         .padding(.top, 16)
@@ -425,15 +435,6 @@ private struct EmergencyScreen: View {
     }
 
     private func emergencyButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.white.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
+        SosSolidButton(title: title, action: action)
     }
 }

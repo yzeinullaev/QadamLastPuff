@@ -96,9 +96,10 @@ class PreferencesManager(context: Context) {
         }
     }
 
-    suspend fun addCoin() {
+    suspend fun addCoins(amount: Int) {
+        if (amount <= 0) return
         dataStore.edit { prefs ->
-            prefs[Keys.TOTAL_COINS] = (prefs[Keys.TOTAL_COINS] ?: 0) + 1
+            prefs[Keys.TOTAL_COINS] = (prefs[Keys.TOTAL_COINS] ?: 0) + amount
         }
     }
 

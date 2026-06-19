@@ -109,7 +109,7 @@ class UserRepository(
         }
     }
 
-    suspend fun recordCraving(intensity: Int, trigger: String, success: Boolean) {
+    suspend fun recordCraving(intensity: Int, trigger: String, success: Boolean): Int {
         val event = CravingEvent(
             createdAt = System.currentTimeMillis(),
             intensity = intensity,
@@ -122,15 +122,23 @@ class UserRepository(
             relapseEventDao.insert(
                 RelapseEventEntity(createdAt = System.currentTimeMillis())
             )
-            val profile = getProfile() ?: return
+            val profile = getProfile() ?: return 0
             userProfileDao.update(
                 profile.copy(lastSmokeDate = System.currentTimeMillis()).toEntity()
             )
         } else {
-            preferencesManager.addCoin()
+            val coins = AppConstants.coinRewardForIntensity(intensity)
+            preferencesManager.addCoins(coins)
+            checkAndUnlockAchievements()
+            return coins
         }
 
         checkAndUnlockAchievements()
+        return 0
+    }
+
+    suspend fun recordRelapse() {
+        recordCraving(intensity = 5, trigger = "Срыв", success = false)
     }
 
     suspend fun applySosRecoveryBoost(): Pair<RecoveryIndex, RecoveryIndex> {
@@ -216,7 +224,7 @@ class UserRepository(
                 .get(java.util.Calendar.HOUR_OF_DAY)
             val daySession = MessageSession(dayIndex)
             val quote = SupportMessageBank.dayMessage(hour, daySession)
-            val achievements = buildAchievements(profile, unlocked, cravings)
+            val achievements = buildAchievements(profile, unlocked, coins, cravings)
             val nextAchievement = achievements.firstOrNull { !it.isUnlocked }
             val days = StatsCalculator.daysWithoutSmoking(profile.lastSmokeDate, now)
             val hours = StatsCalculator.hoursWithoutSmoking(profile.lastSmokeDate, now) % 24
@@ -304,16 +312,22 @@ class UserRepository(
         }
 
     fun observeAchievements(): Flow<List<Achievement>> =
-        combine(observeProfile(), observeCravingEvents(), preferencesManager.unlockedAchievementsFlow()) { profile, cravings, unlocked ->
+        combine(
+            observeProfile(),
+            observeCravingEvents(),
+            preferencesManager.unlockedAchievementsFlow(),
+            preferencesManager.totalCoinsFlow()
+        ) { profile, cravings, unlocked, coins ->
             if (profile == null) emptyList()
-            else buildAchievements(profile, unlocked, cravings)
+            else buildAchievements(profile, unlocked, coins, cravings)
         }
 
     private suspend fun checkAndUnlockAchievements() {
         val profile = getProfile() ?: return
         val cravings = cravingEventDao.getAll().map { it.toDomain() }
         val unlocked = preferencesManager.unlockedAchievementsFlow().first()
-        val achievements = buildAchievements(profile, unlocked, cravings)
+        val coins = preferencesManager.totalCoinsFlow().first()
+        val achievements = buildAchievements(profile, unlocked, coins, cravings)
         achievements.filter { it.isUnlocked && it.id !in unlocked }.forEach {
             preferencesManager.unlockAchievement(it.id)
         }
@@ -322,6 +336,7 @@ class UserRepository(
     private fun buildAchievements(
         profile: UserProfile,
         unlocked: Set<String>,
+        totalCoins: Int,
         cravings: List<CravingEvent> = emptyList()
     ): List<Achievement> {
         val now = System.currentTimeMillis()
@@ -343,6 +358,10 @@ class UserRepository(
             "money_10000" to (money >= 10000),
             "wins_10" to (wins >= 10),
             "wins_50" to (wins >= 50),
+            "coins_20" to (totalCoins >= 20),
+            "coins_40" to (totalCoins >= 40),
+            "coins_80" to (totalCoins >= 80),
+            "coins_110" to (totalCoins >= 110),
             "relapse_survived" to hasRelapse
         )
 

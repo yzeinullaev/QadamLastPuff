@@ -26,6 +26,7 @@ enum class MessageCategory {
     HUMOR,
     PSYCHOLOGY,
     DIALOG,
+    CHECK_IN,
     FUTURE_HOLD,
     WIN_STREAK,
     ACHIEVEMENT_MOMENT

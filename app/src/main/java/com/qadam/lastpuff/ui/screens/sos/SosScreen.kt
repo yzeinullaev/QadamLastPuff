@@ -304,6 +304,7 @@ fun SosScreen(
             after = state.recoveryAfter,
             showCoinAnimation = state.showCoinAnimation,
             totalCoins = homeStats?.totalCoins ?: 1,
+            coinsEarned = state.coinsEarned,
             onContinue = {
                 viewModel.resetSos()
                 onComplete()

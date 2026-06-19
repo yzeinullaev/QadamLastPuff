@@ -107,7 +107,10 @@ final class PreferencesManager {
         lastPersonalLetterDay = Int(Date().timeIntervalSince1970 / 86400)
     }
 
-    func addCoin() { totalCoins += 1 }
+    func addCoins(_ amount: Int) {
+        guard amount > 0 else { return }
+        totalCoins += amount
+    }
 
     func unlockAchievement(_ id: String) {
         var set = unlockedAchievements

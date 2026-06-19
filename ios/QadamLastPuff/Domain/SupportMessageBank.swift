@@ -180,6 +180,13 @@ enum SupportMessageBank {
             "Ещё минута. Мы почти у цели.",
             "Ты не один в этом моменте."
         ],
+        .checkIn: [
+            "Как день? Не было срыва?",
+            "Как ты сегодня? Держишься без сигарет?",
+            "Проверка дня: всё ли в порядке?",
+            "Как прошёл день? Ты справился?",
+            "Был ли сегодня срыв? Если нет — это победа."
+        ],
         .futureHold: [
             "Если выдержишь ещё минуту, вероятность закурить станет значительно ниже.",
             "Каждая секунда сейчас укрепляет твою новую привычку.",
@@ -211,6 +218,16 @@ enum SupportMessageBank {
         default: category = .day
         }
         return session.pick(category)
+    }
+
+    static func checkInMessage(hour: Int, session: MessageSession) -> String {
+        let intro = session.pick(.checkIn)
+        let quote = dayMessage(hour: hour, session: session)
+        return "\(intro) \(quote)"
+    }
+
+    static func holdingEncouragement(session: MessageSession) -> String {
+        session.pick(.victory)
     }
 
     static func memoryForReason(_ reason: String, goalTitle: String?) -> String? {

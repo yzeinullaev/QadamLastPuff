@@ -5,7 +5,7 @@ enum MessageCategory: String, CaseIterable {
     case sosStart, sos15Sec, sos30Sec, sos45Sec, sos60Sec, sos75Sec
     case sos90Sec, sos105Sec, sos120Sec, sos140Sec, sosLast20
     case victory, relapse, money, health, family, challenge, breath
-    case fact, humor, psychology, dialog, futureHold, winStreak, achievementMoment
+    case fact, humor, psychology, dialog, checkIn, futureHold, winStreak, achievementMoment
 }
 
 enum SosMode: CaseIterable {

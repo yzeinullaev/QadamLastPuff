@@ -8,6 +8,7 @@ struct QadamLastPuffApp: App {
         let store = DataStore()
         let prefs = PreferencesManager()
         let repository = UserRepository(store: store, preferences: prefs)
+        NotificationManager.shared.configure(repository: repository)
         _viewModel = StateObject(wrappedValue: AppViewModel(repository: repository))
     }
 

@@ -105,7 +105,8 @@ final class UserRepository: ObservableObject {
         return StatsCalculator.moneySaved(profile: profile)
     }
 
-    func recordCraving(intensity: Int, trigger: String, location: String, success: Bool) {
+    @discardableResult
+    func recordCraving(intensity: Int, trigger: String, location: String, success: Bool) -> Int {
         store.update { data in
             let event = CravingEvent(
                 id: data.nextCravingId,
@@ -128,8 +129,18 @@ final class UserRepository: ObservableObject {
                 }
             }
         }
-        if success { preferences.addCoin() }
+        if success {
+            let coins = AppConstants.coinReward(for: intensity)
+            preferences.addCoins(coins)
+            checkAndUnlockAchievements()
+            return coins
+        }
         checkAndUnlockAchievements()
+        return 0
+    }
+
+    func recordRelapse() {
+        recordCraving(intensity: 5, trigger: "Срыв", location: "", success: false)
     }
 
     func applySosRecoveryBoost() -> (RecoveryIndex, RecoveryIndex) {
@@ -268,6 +279,7 @@ final class UserRepository: ObservableObject {
         let money = StatsCalculator.moneySaved(profile: profile, now: now)
         let wins = cravings.filter(\.success).count
         let hasRelapse = cravings.contains { !$0.success }
+        let totalCoins = preferences.totalCoins
 
         let conditions: [String: Bool] = [
             "first_hour": elapsed >= 60 * 60 * 1000,
@@ -280,6 +292,10 @@ final class UserRepository: ObservableObject {
             "money_10000": money >= 10000,
             "wins_10": wins >= 10,
             "wins_50": wins >= 50,
+            "coins_20": totalCoins >= 20,
+            "coins_40": totalCoins >= 40,
+            "coins_80": totalCoins >= 80,
+            "coins_110": totalCoins >= 110,
             "relapse_survived": hasRelapse
         ]
 

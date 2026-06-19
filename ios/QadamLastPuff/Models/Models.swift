@@ -173,6 +173,7 @@ struct SosUiState: Equatable {
     var showPhoto: Bool = false
     var showPersonalLetterDialog: Bool = false
     var showCoinAnimation: Bool = false
+    var coinsEarned: Int = 0
     var success: Bool = false
     var recoveryBefore: RecoveryIndex = RecoveryIndex()
     var recoveryAfter: RecoveryIndex = RecoveryIndex()

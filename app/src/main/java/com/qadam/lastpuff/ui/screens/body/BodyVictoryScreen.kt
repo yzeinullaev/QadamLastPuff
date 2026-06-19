@@ -54,6 +54,7 @@ fun BodyVictoryScreen(
     after: RecoveryIndex,
     showCoinAnimation: Boolean,
     totalCoins: Int,
+    coinsEarned: Int = 1,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -90,7 +91,11 @@ fun BodyVictoryScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (showCoinAnimation) {
-                CoinDropAnimation(visible = true, totalCoins = totalCoins)
+                CoinDropAnimation(
+                    visible = true,
+                    totalCoins = totalCoins,
+                    coinsEarned = coinsEarned
+                )
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
